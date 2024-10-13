@@ -3,7 +3,6 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-
 const apiRoutes = require('./routes/api.js');
 const fccTestingRoutes = require('./routes/fcctesting.js');
 const runner = require('./test-runner');
@@ -12,14 +11,11 @@ const app = express();
 
 // Serve static files
 app.use('/public', express.static(process.cwd() + '/public'));
-
-// Allow CORS for FCC testing purposes
 app.use(cors({ origin: '*' }));
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Security settings
+// Security headers
 app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-DNS-Prefetch-Control', 'off');
@@ -27,34 +23,32 @@ app.use((req, res, next) => {
   next();
 });
 
-// Sample front-end routes
+// Sample front-end
 app.route('/b/:board/')
-  .get(function (req, res) {
+  .get((req, res) => {
     res.sendFile(process.cwd() + '/views/board.html');
   });
 
 app.route('/b/:board/:threadid')
-  .get(function (req, res) {
+  .get((req, res) => {
     res.sendFile(process.cwd() + '/views/thread.html');
   });
 
-// Index page
+// Index page (static HTML)
 app.route('/')
-  .get(function (req, res) {
+  .get((req, res) => {
     res.sendFile(process.cwd() + '/views/index.html');
   });
 
-// FCC testing routes
+// For FCC testing purposes
 fccTestingRoutes(app);
 
 // API routing
 apiRoutes(app);
 
-// 404 middleware
+// 404 Not Found Middleware
 app.use(function (req, res, next) {
-  res.status(404)
-    .type('text')
-    .send('Not Found');
+  res.status(404).type('text').send('Not Found');
 });
 
 // Start server and run tests
